@@ -1,6 +1,7 @@
 package tests;
 
 import api.AuthorizationApi;
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Configuration;
 import com.github.javafaker.Faker;
 import io.restassured.RestAssured;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Cookie;
 import static api.AuthorizationApi.ALLURE_TESTOPS_SESSION;
-import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.WebDriverRunner.getWebDriver;
 import static config.UserProperties.*;
@@ -99,8 +99,11 @@ public class AllureTestopsTests {
         getWebDriver().manage().addCookie(new Cookie(ALLURE_TESTOPS_SESSION, authorizationCookie));
 
         open("/project/1771/test-cases/" + testCaseId);
-        for (int i = 0; i < stepList.size(); i++) {
-            $$(".TreeElement__node").get(i).shouldHave(text(stepList.get(i).getName()));
-        }
+
+        List<String> expectedSteps = stepList.stream().map(StepData::getName).toList();
+            $$(".TreeElement__node").shouldHave(CollectionCondition.texts(expectedSteps));
+//        }
+
     }
+
 }
